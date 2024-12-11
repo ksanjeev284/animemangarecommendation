@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { Tv2, Sparkles, Book } from 'lucide-react';
+import { Tv2, Sparkles, Book, Mail, FileText, Info, Menu } from 'lucide-react';
 import { AnimePrompt } from './components/AnimePrompt';
 import { AnimeList } from './components/AnimeList';
 import { PreferencesForm } from './components/PreferencesForm';
@@ -8,8 +8,72 @@ import { SearchBar } from './components/SearchBar';
 import { FilterTags } from './components/FilterTags';
 import { useAnimeStore } from './store/useAnimeStore';
 import { fetchTopAnime, fetchSeasonalAnime } from './services/api';
-import AnimePage from './pages/AnimePage';
 import MangaPage from './pages/MangaPage';
+import { Footer } from './components/Footer';
+import { AboutPage } from './pages/policy/AboutPage';
+import { PrivacyPage } from './pages/policy/PrivacyPage';
+import { TermsPage } from './pages/policy/TermsPage';
+import { ContactPage } from './pages/policy/ContactPage';
+
+function QuickLinks() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+        aria-label="Quick Links"
+      >
+        <Menu className="h-5 w-5" />
+        <span className="text-sm font-medium">Quick Links</span>
+      </button>
+
+      {isOpen && (
+        <>
+          <div 
+            className="fixed inset-0 bg-black/20 z-40"
+            onClick={() => setIsOpen(false)}
+          />
+          <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-2 z-50">
+            <Link
+              to="/about"
+              className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-purple-50 hover:text-purple-600"
+              onClick={() => setIsOpen(false)}
+            >
+              <Info className="h-4 w-4" />
+              <span>About</span>
+            </Link>
+            <Link
+              to="/privacy"
+              className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-purple-50 hover:text-purple-600"
+              onClick={() => setIsOpen(false)}
+            >
+              <FileText className="h-4 w-4" />
+              <span>Privacy Policy</span>
+            </Link>
+            <Link
+              to="/terms"
+              className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-purple-50 hover:text-purple-600"
+              onClick={() => setIsOpen(false)}
+            >
+              <FileText className="h-4 w-4" />
+              <span>Terms of Service</span>
+            </Link>
+            <Link
+              to="/contact"
+              className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-purple-50 hover:text-purple-600"
+              onClick={() => setIsOpen(false)}
+            >
+              <Mail className="h-4 w-4" />
+              <span>Contact</span>
+            </Link>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
 
 function App() {
   const { setAnimeList } = useAnimeStore();
@@ -51,6 +115,7 @@ function App() {
                     </h1>
                   </div>
                   <div className="flex items-center space-x-4">
+                    <QuickLinks />
                     <div className="flex items-center">
                       <Sparkles className="h-5 w-5 text-yellow-500 mr-2" />
                       <span className="text-gray-600 font-medium">AI-Powered</span>
@@ -106,13 +171,7 @@ function App() {
               </div>
             </main>
 
-            <footer className="bg-white mt-16 border-t border-gray-200">
-              <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
-                <p className="text-center text-gray-500">
-                  Powered by Jikan API • Made with ❤️ for anime fans
-                </p>
-              </div>
-            </footer>
+            <Footer />
           </div>
         } />
         <Route path="/manga" element={
@@ -165,15 +224,13 @@ function App() {
               <MangaPage />
             </main>
 
-            <footer className="bg-white mt-16 border-t border-gray-200">
-              <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
-                <p className="text-center text-gray-500">
-                  Powered by Jikan API • Made with ❤️ for manga fans
-                </p>
-              </div>
-            </footer>
+            <Footer />
           </div>
         } />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/contact" element={<ContactPage />} />
       </Routes>
     </Router>
   );

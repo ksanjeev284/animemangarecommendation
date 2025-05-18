@@ -1,4 +1,12 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://animetrend.in/sitemap.xml 
+Sitemap: https://www.animetrend.in/sitemap.xml
+
+# Disallow admin and API routes
+Disallow: /admin/
+Disallow: /api/
+Disallow: /private/
+
+# Crawl-delay for all bots
+Crawl-delay: 10 

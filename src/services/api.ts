@@ -97,6 +97,16 @@ export async function fetchSeasonalAnime(
   }
 }
 
+export async function fetchAnimeById(id: number): Promise<Anime | null> {
+  try {
+    const response = await axios.get(`${JIKAN_API_BASE}/anime/${id}`);
+    return convertToAnime(response.data.data);
+  } catch (error) {
+    console.error('Error fetching anime by ID:', error);
+    return null;
+  }
+}
+
 // Manga API calls
 export async function fetchTopManga(): Promise<Manga[]> {
   try {
@@ -149,6 +159,16 @@ export async function searchManga(query: string): Promise<Manga[]> {
   } catch (error) {
     console.error('Error searching manga:', error);
     return [];
+  }
+}
+
+export async function fetchMangaById(id: number): Promise<Manga | null> {
+  try {
+    const response = await axios.get(`${JIKAN_API_BASE}/manga/${id}`);
+    return convertToManga(response.data.data);
+  } catch (error) {
+    console.error('Error fetching manga by ID:', error);
+    return null;
   }
 }
 

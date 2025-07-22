@@ -14,6 +14,8 @@ import { AboutPage } from './pages/policy/AboutPage';
 import { PrivacyPage } from './pages/policy/PrivacyPage';
 import { TermsPage } from './pages/policy/TermsPage';
 import { ContactPage } from './pages/policy/ContactPage';
+import AnimeDetailPage from './pages/AnimeDetailPage';
+import MangaDetailPage from './pages/MangaDetailPage';
 
 function QuickLinks() {
   const [isOpen, setIsOpen] = useState(false);
@@ -231,6 +233,8 @@ function App() {
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/contact" element={<ContactPage />} />
+        <Route path="/anime/:id" element={<AnimeDetailPage />} />
+        <Route path="/manga/:id" element={<MangaDetailPage />} />
       </Routes>
     </Router>
   );

@@ -1,5 +1,6 @@
 export interface Anime {
   id: number;
+  slug: string;
   title: string;
   genre: string[];
   rating: number;

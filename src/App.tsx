@@ -233,8 +233,8 @@ function App() {
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/contact" element={<ContactPage />} />
-        <Route path="/anime/:id" element={<AnimeDetailPage />} />
-        <Route path="/manga/:id" element={<MangaDetailPage />} />
+        <Route path="/anime/:slug" element={<AnimeDetailPage />} />
+        <Route path="/manga/:slug" element={<MangaDetailPage />} />
       </Routes>
     </Router>
   );

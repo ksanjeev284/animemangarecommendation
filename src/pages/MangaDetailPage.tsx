@@ -3,21 +3,30 @@ import { useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { fetchMangaById } from '../services/api';
 import { Manga } from '../types/manga';
+import { useMangaStore } from '../store/useMangaStore';
 
 export default function MangaDetailPage() {
-  const { id } = useParams();
+  const { slug } = useParams();
+  const { mangaList } = useMangaStore();
   const [manga, setManga] = useState<Manga | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadManga() {
       setLoading(true);
-      const data = await fetchMangaById(Number(id));
-      setManga(data);
+      // Find manga by slug from the list
+      const found = mangaList.find(m => m.slug === slug);
+      if (found) {
+        // Fetch full details by ID
+        const data = await fetchMangaById(found.id);
+        setManga(data);
+      } else {
+        setManga(null);
+      }
       setLoading(false);
     }
     loadManga();
-  }, [id]);
+  }, [slug, mangaList]);
 
   if (loading) return <div className="text-center py-12">Loading...</div>;
   if (!manga) return <div className="text-center py-12">Manga not found.</div>;
@@ -27,7 +36,7 @@ export default function MangaDetailPage() {
       <Helmet>
         <title>{manga.title} | Manga Details | AnimeTrend</title>
         <meta name="description" content={manga.description} />
-        <link rel="canonical" href={`https://www.animetrend.in/manga/${manga.id}`} />
+        <link rel="canonical" href={`https://www.animetrend.in/manga/${manga.slug}`} />
         <script type="application/ld+json">{JSON.stringify({
           '@context': 'https://schema.org',
           '@type': 'BookSeries',

@@ -9,7 +9,7 @@ interface MangaCardProps {
 
 export function MangaCard({ manga }: MangaCardProps) {
   return (
-    <Link to={`/manga/${manga.id}`} className="block">
+    <Link to={`/manga/${manga.slug}`} className="block">
       <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden border border-gray-100">
         <div className="aspect-[3/4] relative overflow-hidden">
           <img

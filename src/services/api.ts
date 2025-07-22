@@ -1,12 +1,14 @@
 import axios from 'axios';
 import { Anime } from '../types/anime';
 import { Manga } from '../types/manga';
+import { slugify } from '../utils/slugify';
 
 const JIKAN_API_BASE = 'https://api.jikan.moe/v4';
 
 // Helper function to convert Jikan API response to our Anime type
 const convertToAnime = (anime: any): Anime => ({
   id: anime.mal_id,
+  slug: slugify(anime.title),
   title: anime.title,
   genre: anime.genres?.map((g: any) => g.name) || [],
   rating: anime.score || 0,
@@ -18,6 +20,7 @@ const convertToAnime = (anime: any): Anime => ({
 // Helper function to convert Jikan API response to our Manga type
 const convertToManga = (manga: any): Manga => ({
   id: manga.mal_id,
+  slug: slugify(manga.title),
   title: manga.title,
   genre: manga.genres?.map((g: any) => g.name) || [],
   rating: manga.score || 0,

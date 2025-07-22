@@ -9,7 +9,7 @@ interface AnimeCardProps {
 
 export function AnimeCard({ anime }: AnimeCardProps) {
   return (
-    <Link to={`/anime/${anime.id}`} className="block">
+    <Link to={`/anime/${anime.slug}`} className="block">
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-200">
         <div className="aspect-[16/9] relative overflow-hidden">
           <img

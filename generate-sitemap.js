@@ -35,6 +35,7 @@ async function fetchAll(endpoint) {
       `${SITE_URL}/trending`,
       `${SITE_URL}/discover`,
       `${SITE_URL}/about`,
+      `${SITE_URL}/seasonal`,
       ...animeList.map(a => `${SITE_URL}/anime/${a.id || a.slug}`),
       ...mangaList.map(m => `${SITE_URL}/manga/${m.id || m.slug}`),
     ];

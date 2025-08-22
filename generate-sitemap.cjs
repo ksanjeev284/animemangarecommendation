@@ -58,6 +58,7 @@ async function fetchTopManga() {
       `${SITE_URL}/trending`,
       `${SITE_URL}/discover`,
       `${SITE_URL}/about`,
+      `${SITE_URL}/seasonal`,
       ...animeList.map(a => `${SITE_URL}/anime/${a.mal_id}`),
       ...mangaList.map(m => `${SITE_URL}/manga/${m.mal_id}`),
     ];

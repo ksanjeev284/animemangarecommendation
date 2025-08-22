@@ -135,12 +135,20 @@ export async function fetchUpcomingAnime(): Promise<Anime[]> {
   }
 }
 
-export async function fetchSchedule(day?: string): Promise<Anime[]> {
+type Weekday =
+  | 'monday'
+  | 'tuesday'
+  | 'wednesday'
+  | 'thursday'
+  | 'friday'
+  | 'saturday'
+  | 'sunday';
+
+export async function fetchSchedule(day?: Weekday): Promise<Anime[]> {
   try {
-    const endpoint = day
-      ? `${JIKAN_API_BASE}/schedules/${day}`
-      : `${JIKAN_API_BASE}/schedules`;
-    const response = await axios.get(endpoint);
+    const response = await axios.get(`${JIKAN_API_BASE}/schedules`, {
+      params: day ? { filter: day } : undefined
+    });
     return response.data.data.map(convertToAnime);
   } catch (error) {
     console.error('Error fetching anime schedule:', error);

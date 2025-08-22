@@ -15,7 +15,6 @@ interface RawAnime {
   images: { jpg: { image_url: string } };
   synopsis: string;
   aired?: { from?: string };
-  trailer?: { embed_url?: string | null };
 }
 
 // Helper function to convert Jikan API response to our Anime type
@@ -27,8 +26,7 @@ const convertToAnime = (anime: RawAnime): Anime => ({
   rating: anime.score || 0,
   imageUrl: anime.images.jpg.image_url,
   description: anime.synopsis,
-  year: anime.aired?.from ? new Date(anime.aired.from).getFullYear() : new Date().getFullYear(),
-  trailerUrl: anime.trailer?.embed_url || undefined
+  year: anime.aired?.from ? new Date(anime.aired.from).getFullYear() : new Date().getFullYear()
 });
 
 interface RawManga {
@@ -139,8 +137,13 @@ export async function fetchUpcomingAnime(): Promise<Anime[]> {
 
 export async function fetchAnimeById(id: number): Promise<Anime | null> {
   try {
-    const response = await axios.get(`${JIKAN_API_BASE}/anime/${id}`);
-    return convertToAnime(response.data.data);
+    const [animeRes, videoRes] = await Promise.all([
+      axios.get(`${JIKAN_API_BASE}/anime/${id}`),
+      axios.get(`${JIKAN_API_BASE}/anime/${id}/videos`)
+    ]);
+    const anime = convertToAnime(animeRes.data.data);
+    const trailerUrl = videoRes.data.data?.promo?.[0]?.trailer?.embed_url;
+    return { ...anime, trailerUrl: trailerUrl || undefined };
   } catch (error) {
     console.error('Error fetching anime by ID:', error);
     return null;

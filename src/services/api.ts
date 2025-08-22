@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Anime } from '../types/anime';
+import { Anime, AnimeCharacter } from '../types/anime';
 import { Manga } from '../types/manga';
 import { slugify } from '../utils/slugify';
 
@@ -26,7 +26,8 @@ const convertToAnime = (anime: RawAnime): Anime => ({
   rating: anime.score || 0,
   imageUrl: anime.images.jpg.image_url,
   description: anime.synopsis,
-  year: anime.aired?.from ? new Date(anime.aired.from).getFullYear() : new Date().getFullYear()
+  year: anime.aired?.from ? new Date(anime.aired.from).getFullYear() : new Date().getFullYear(),
+  characters: []
 });
 
 interface RawManga {
@@ -135,10 +136,33 @@ export async function fetchUpcomingAnime(): Promise<Anime[]> {
   }
 }
 
+interface RawAnimeCharacter {
+  character: { name: string; images: { jpg: { image_url: string } } };
+  role: string;
+  voice_actors: { person: { name: string } }[];
+}
+
+export async function fetchAnimeCharacters(id: number): Promise<AnimeCharacter[]> {
+  try {
+    const response = await axios.get(`${JIKAN_API_BASE}/anime/${id}/characters`);
+    return response.data.data.map((ch: RawAnimeCharacter) => ({
+      name: ch.character.name,
+      role: ch.role,
+      voiceActorName: ch.voice_actors?.[0]?.person?.name || 'Unknown',
+      imageUrl: ch.character.images.jpg.image_url
+    }));
+  } catch (error) {
+    console.error('Error fetching anime characters:', error);
+    return [];
+  }
+}
+
 export async function fetchAnimeById(id: number): Promise<Anime | null> {
   try {
     const response = await axios.get(`${JIKAN_API_BASE}/anime/${id}`);
-    return convertToAnime(response.data.data);
+    const anime = convertToAnime(response.data.data);
+    const characters = await fetchAnimeCharacters(id);
+    return { ...anime, characters };
   } catch (error) {
     console.error('Error fetching anime by ID:', error);
     return null;

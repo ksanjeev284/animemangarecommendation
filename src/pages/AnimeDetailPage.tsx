@@ -64,6 +64,25 @@ export default function AnimeDetailPage() {
           <p className="mt-4 text-gray-800">{anime.description}</p>
         </div>
       </div>
+      {anime.characters.length > 0 && (
+        <section className="mt-8">
+          <h2 className="text-2xl font-bold mb-4">Characters</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            {anime.characters.map(character => (
+              <div key={character.name} className="text-center">
+                <img
+                  src={character.imageUrl}
+                  alt={character.name}
+                  className="w-24 h-24 object-cover rounded-full mx-auto mb-2"
+                />
+                <div className="text-sm font-medium">{character.name}</div>
+                <div className="text-xs text-gray-500">{character.role}</div>
+                <div className="text-xs text-gray-700">{character.voiceActorName}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
-} 
+}

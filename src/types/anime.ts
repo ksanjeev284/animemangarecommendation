@@ -1,3 +1,10 @@
+export interface AnimeCharacter {
+  name: string;
+  role: string;
+  voiceActorName: string;
+  imageUrl: string;
+}
+
 export interface Anime {
   id: number;
   slug: string;
@@ -7,6 +14,7 @@ export interface Anime {
   imageUrl: string;
   description: string;
   year: number;
+  characters: AnimeCharacter[];
 }
 
 export type UserPreferences = {

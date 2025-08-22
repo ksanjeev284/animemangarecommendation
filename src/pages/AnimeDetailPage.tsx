@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import { fetchAnimeById } from '../services/api';
+import { fetchAnimeById, fetchAnimeBySlug } from '../services/api';
 import { Anime } from '../types/anime';
 import { useAnimeStore } from '../store/useAnimeStore';
 
@@ -14,15 +14,16 @@ export default function AnimeDetailPage() {
   useEffect(() => {
     async function loadAnime() {
       setLoading(true);
+      let data: Anime | null = null;
       // Find anime by slug from the list
       const found = animeList.find(a => a.slug === slug);
       if (found) {
         // Fetch full details by ID
-        const data = await fetchAnimeById(found.id);
-        setAnime(data);
-      } else {
-        setAnime(null);
+        data = await fetchAnimeById(found.id);
+      } else if (slug) {
+        data = await fetchAnimeBySlug(slug);
       }
+      setAnime(data);
       setLoading(false);
     }
     loadAnime();

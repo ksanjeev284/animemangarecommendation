@@ -5,24 +5,49 @@ import { slugify } from '../utils/slugify';
 
 const JIKAN_API_BASE = 'https://api.jikan.moe/v4';
 
+interface RawGenre { name: string }
+
+interface RawAnime {
+  mal_id: number;
+  title: string;
+  genres?: RawGenre[];
+  score?: number;
+  images: { jpg: { image_url: string } };
+  synopsis: string;
+  aired?: { from?: string };
+}
+
 // Helper function to convert Jikan API response to our Anime type
-const convertToAnime = (anime: any): Anime => ({
+const convertToAnime = (anime: RawAnime): Anime => ({
   id: anime.mal_id,
   slug: slugify(anime.title),
   title: anime.title,
-  genre: anime.genres?.map((g: any) => g.name) || [],
+  genre: anime.genres?.map((g: RawGenre) => g.name) || [],
   rating: anime.score || 0,
   imageUrl: anime.images.jpg.image_url,
   description: anime.synopsis,
   year: anime.aired?.from ? new Date(anime.aired.from).getFullYear() : new Date().getFullYear()
 });
 
+interface RawManga {
+  mal_id: number;
+  title: string;
+  genres?: RawGenre[];
+  score?: number;
+  images: { jpg: { image_url: string } };
+  synopsis: string;
+  published?: { from?: string };
+  status?: string;
+  chapters?: number;
+  volumes?: number;
+}
+
 // Helper function to convert Jikan API response to our Manga type
-const convertToManga = (manga: any): Manga => ({
+const convertToManga = (manga: RawManga): Manga => ({
   id: manga.mal_id,
   slug: slugify(manga.title),
   title: manga.title,
-  genre: manga.genres?.map((g: any) => g.name) || [],
+  genre: manga.genres?.map((g: RawGenre) => g.name) || [],
   rating: manga.score || 0,
   imageUrl: manga.images.jpg.image_url,
   description: manga.synopsis,
@@ -100,12 +125,37 @@ export async function fetchSeasonalAnime(
   }
 }
 
+export async function fetchUpcomingAnime(): Promise<Anime[]> {
+  try {
+    const response = await axios.get(`${JIKAN_API_BASE}/seasons/upcoming`);
+    return response.data.data.map(convertToAnime);
+  } catch (error) {
+    console.error('Error fetching upcoming anime:', error);
+    return [];
+  }
+}
+
 export async function fetchAnimeById(id: number): Promise<Anime | null> {
   try {
     const response = await axios.get(`${JIKAN_API_BASE}/anime/${id}`);
     return convertToAnime(response.data.data);
   } catch (error) {
     console.error('Error fetching anime by ID:', error);
+    return null;
+  }
+}
+
+export async function fetchAnimeBySlug(slug: string): Promise<Anime | null> {
+  try {
+    const query = slug.replace(/-/g, ' ');
+    const searchResponse = await axios.get(`${JIKAN_API_BASE}/anime`, {
+      params: { q: query, limit: 1 }
+    });
+    const result = searchResponse.data.data[0];
+    if (!result) return null;
+    return await fetchAnimeById(result.mal_id);
+  } catch (error) {
+    console.error('Error fetching anime by slug:', error);
     return null;
   }
 }

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { Tv2, Sparkles, Book, Mail, FileText, Info, Menu } from 'lucide-react';
+import { Tv2, Sparkles, Book, Mail, FileText, Info, Menu, Calendar } from 'lucide-react';
 import { AnimePrompt } from './components/AnimePrompt';
 import { AnimeList } from './components/AnimeList';
 import { PreferencesForm } from './components/PreferencesForm';
@@ -16,6 +16,7 @@ import { TermsPage } from './pages/policy/TermsPage';
 import { ContactPage } from './pages/policy/ContactPage';
 import AnimeDetailPage from './pages/AnimeDetailPage';
 import MangaDetailPage from './pages/MangaDetailPage';
+import SeasonalAnimePage from './pages/SeasonalAnimePage';
 
 function QuickLinks() {
   const [isOpen, setIsOpen] = useState(false);
@@ -31,18 +32,26 @@ function QuickLinks() {
         <span className="text-sm font-medium">Quick Links</span>
       </button>
 
-      {isOpen && (
-        <>
-          <div 
-            className="fixed inset-0 bg-black/20 z-40"
-            onClick={() => setIsOpen(false)}
-          />
-          <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-2 z-50">
-            <Link
-              to="/about"
-              className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-purple-50 hover:text-purple-600"
-              onClick={() => setIsOpen(false)}
-            >
+          {isOpen && (
+            <>
+              <div
+                className="fixed inset-0 bg-black/20 z-40"
+                onClick={() => setIsOpen(false)}
+              />
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-2 z-50">
+                <Link
+                  to="/seasonal"
+                  className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-purple-50 hover:text-purple-600"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <Calendar className="h-4 w-4" />
+                  <span>Seasonal Anime</span>
+                </Link>
+                <Link
+                  to="/about"
+                  className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-purple-50 hover:text-purple-600"
+                  onClick={() => setIsOpen(false)}
+                >
               <Info className="h-4 w-4" />
               <span>About</span>
             </Link>
@@ -229,6 +238,7 @@ function App() {
             <Footer />
           </div>
         } />
+        <Route path="/seasonal" element={<SeasonalAnimePage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/terms" element={<TermsPage />} />

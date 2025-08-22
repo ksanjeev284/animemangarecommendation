@@ -225,6 +225,24 @@ export async function fetchMangaById(id: number): Promise<Manga | null> {
   }
 }
 
+export async function fetchUserAnimeList(username: string): Promise<Anime[]> {
+  try {
+    const response = await axios.get(
+      `${JIKAN_API_BASE}/users/${username}/animelist`,
+      {
+        params: { limit: 1000 },
+      }
+    );
+    interface UserAnimeEntry {
+      anime: RawAnime;
+    }
+    return response.data.data.map((entry: UserAnimeEntry) => convertToAnime(entry.anime));
+  } catch (error) {
+    console.error('Error fetching user animelist:', error);
+    return [];
+  }
+}
+
 // Helper function to get current season
 function getCurrentSeason(): 'winter' | 'spring' | 'summer' | 'fall' {
   const month = new Date().getMonth();

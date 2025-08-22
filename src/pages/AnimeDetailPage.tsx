@@ -4,12 +4,14 @@ import { Helmet } from 'react-helmet';
 import { fetchAnimeById, fetchAnimeBySlug } from '../services/api';
 import { Anime } from '../types/anime';
 import { useAnimeStore } from '../store/useAnimeStore';
+import { useWatchlistStore } from '../store/useWatchlistStore';
 
 export default function AnimeDetailPage() {
   const { slug } = useParams();
   const { animeList } = useAnimeStore();
   const [anime, setAnime] = useState<Anime | null>(null);
   const [loading, setLoading] = useState(true);
+  const { addToWatchlist, removeFromWatchlist, watchlist } = useWatchlistStore();
 
   useEffect(() => {
     async function loadAnime() {
@@ -31,6 +33,12 @@ export default function AnimeDetailPage() {
 
   if (loading) return <div className="text-center py-12">Loading...</div>;
   if (!anime) return <div className="text-center py-12">Anime not found.</div>;
+
+  const isInWatchlist = watchlist.some((a) => a.id === anime.id);
+  const handleWatchlist = () => {
+    if (isInWatchlist) removeFromWatchlist(anime.id);
+    else addToWatchlist(anime);
+  };
 
   return (
     <div className="max-w-3xl mx-auto py-8 px-4">
@@ -61,6 +69,12 @@ export default function AnimeDetailPage() {
           <div className="mb-2 text-gray-600">{anime.genre.join(', ')}</div>
           <div className="mb-2 text-yellow-600 font-semibold">Rating: {anime.rating}</div>
           <div className="mb-2 text-gray-500">Year: {anime.year}</div>
+          <button
+            onClick={handleWatchlist}
+            className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"
+          >
+            {isInWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist'}
+          </button>
           <p className="mt-4 text-gray-800">{anime.description}</p>
         </div>
       </div>

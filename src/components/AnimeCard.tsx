@@ -2,12 +2,23 @@ import React from 'react';
 import { Star, Calendar, Tag } from 'lucide-react';
 import { Anime } from '../types/anime';
 import { Link } from 'react-router-dom';
+import { useWatchlistStore } from '../store/useWatchlistStore';
 
 interface AnimeCardProps {
   anime: Anime;
 }
 
 export function AnimeCard({ anime }: AnimeCardProps) {
+  const { addToWatchlist, removeFromWatchlist, watchlist } = useWatchlistStore();
+  const isInWatchlist = watchlist.some((a) => a.id === anime.id);
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isInWatchlist) removeFromWatchlist(anime.id);
+    else addToWatchlist(anime);
+  };
+
   return (
     <Link to={`/anime/${anime.slug}`} className="block">
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-200">
@@ -52,8 +63,15 @@ export function AnimeCard({ anime }: AnimeCardProps) {
               </span>
             ))}
           </div>
+          <button
+            onClick={handleClick}
+            className="mt-4 w-full px-3 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"
+          >
+            {isInWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist'}
+          </button>
         </div>
       </div>
     </Link>
   );
 }
+

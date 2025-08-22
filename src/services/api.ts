@@ -135,6 +135,19 @@ export async function fetchUpcomingAnime(): Promise<Anime[]> {
   }
 }
 
+export async function fetchSchedule(day?: string): Promise<Anime[]> {
+  try {
+    const endpoint = day
+      ? `${JIKAN_API_BASE}/schedules/${day}`
+      : `${JIKAN_API_BASE}/schedules`;
+    const response = await axios.get(endpoint);
+    return response.data.data.map(convertToAnime);
+  } catch (error) {
+    console.error('Error fetching anime schedule:', error);
+    return [];
+  }
+}
+
 export async function fetchAnimeById(id: number): Promise<Anime | null> {
   try {
     const response = await axios.get(`${JIKAN_API_BASE}/anime/${id}`);

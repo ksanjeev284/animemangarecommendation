@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { Tv2, Sparkles, Book, Mail, FileText, Info, Menu, Calendar } from 'lucide-react';
+import { Tv2, Sparkles, Book, Mail, FileText, Info, Menu, Calendar, List } from 'lucide-react';
 import { AnimePrompt } from './components/AnimePrompt';
 import { AnimeList } from './components/AnimeList';
 import { PreferencesForm } from './components/PreferencesForm';
@@ -17,6 +17,7 @@ import { ContactPage } from './pages/policy/ContactPage';
 import AnimeDetailPage from './pages/AnimeDetailPage';
 import MangaDetailPage from './pages/MangaDetailPage';
 import SeasonalAnimePage from './pages/SeasonalAnimePage';
+import SchedulePage from './pages/SchedulePage';
 
 function QuickLinks() {
   const [isOpen, setIsOpen] = useState(false);
@@ -46,6 +47,14 @@ function QuickLinks() {
                 >
                   <Calendar className="h-4 w-4" />
                   <span>Seasonal Anime</span>
+                </Link>
+                <Link
+                  to="/schedule"
+                  className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-purple-50 hover:text-purple-600"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <List className="h-4 w-4" />
+                  <span>Schedule</span>
                 </Link>
                 <Link
                   to="/about"
@@ -239,6 +248,7 @@ function App() {
           </div>
         } />
         <Route path="/seasonal" element={<SeasonalAnimePage />} />
+        <Route path="/schedule" element={<SchedulePage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/terms" element={<TermsPage />} />

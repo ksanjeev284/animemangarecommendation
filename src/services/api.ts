@@ -145,6 +145,21 @@ export async function fetchAnimeById(id: number): Promise<Anime | null> {
   }
 }
 
+export async function fetchAnimeBySlug(slug: string): Promise<Anime | null> {
+  try {
+    const query = slug.replace(/-/g, ' ');
+    const searchResponse = await axios.get(`${JIKAN_API_BASE}/anime`, {
+      params: { q: query, limit: 1 }
+    });
+    const result = searchResponse.data.data[0];
+    if (!result) return null;
+    return await fetchAnimeById(result.mal_id);
+  } catch (error) {
+    console.error('Error fetching anime by slug:', error);
+    return null;
+  }
+}
+
 // Manga API calls
 export async function fetchTopManga(): Promise<Manga[]> {
   try {

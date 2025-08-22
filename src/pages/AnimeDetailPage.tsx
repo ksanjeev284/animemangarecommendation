@@ -12,6 +12,7 @@ export default function AnimeDetailPage() {
   const [anime, setAnime] = useState<Anime | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
 
   useEffect(() => {
     async function loadAnime() {
@@ -26,14 +27,21 @@ export default function AnimeDetailPage() {
         data = await fetchAnimeBySlug(slug);
       }
       setAnime(data);
-      if (data) {
-        const reviewData = await fetchAnimeReviews(data.id);
-        setReviews(reviewData);
-      }
       setLoading(false);
     }
     loadAnime();
   }, [slug, animeList]);
+
+  useEffect(() => {
+    async function loadReviews() {
+      if (!anime) return;
+      setReviewsLoading(true);
+      const reviewData = await fetchAnimeReviews(anime.id);
+      setReviews(reviewData);
+      setReviewsLoading(false);
+    }
+    loadReviews();
+  }, [anime]);
 
   if (loading) return <div className="text-center py-12">Loading...</div>;
   if (!anime) return <div className="text-center py-12">Anime not found.</div>;
@@ -72,12 +80,14 @@ export default function AnimeDetailPage() {
         </div>
         <div className="mt-8">
           <h2 className="text-2xl font-bold mb-4">Reviews</h2>
-          {reviews.length === 0 ? (
+          {reviewsLoading ? (
+            <p className="text-gray-600">Loading reviews...</p>
+          ) : reviews.length === 0 ? (
             <p className="text-gray-600">No reviews available.</p>
           ) : (
             <div className="space-y-4">
               {reviews.slice(0, 5).map((review, index) => (
-                <div key={index} className="border rounded p-4">
+                <div key={`${review.author}-${index}`} className="border rounded p-4">
                   <div className="font-semibold">{review.author}</div>
                   <div className="text-yellow-600">Score: {review.score}</div>
                   <p className="mt-2 text-gray-700">{review.text}</p>

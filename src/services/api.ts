@@ -169,7 +169,9 @@ export async function fetchAnimeBySlug(slug: string): Promise<Anime | null> {
 
 export async function fetchAnimeReviews(id: number): Promise<Review[]> {
   try {
-    const response = await axios.get(`${JIKAN_API_BASE}/anime/${id}/reviews`);
+    const response = await axios.get(`${JIKAN_API_BASE}/anime/${id}/reviews`, {
+      params: { limit: 5 }
+    });
     return response.data.data.map((review: RawReview) => ({
       author: review.user?.username,
       score: review.score,

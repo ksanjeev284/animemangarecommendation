@@ -70,6 +70,7 @@ export default function AnimeDetailPage() {
             src={anime.trailerUrl}
             title={`${anime.title} Trailer`}
             className="w-full h-64 md:h-96"
+            loading="lazy"
             allowFullScreen
           />
         </div>

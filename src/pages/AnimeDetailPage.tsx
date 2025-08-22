@@ -64,6 +64,16 @@ export default function AnimeDetailPage() {
           <p className="mt-4 text-gray-800">{anime.description}</p>
         </div>
       </div>
+      {anime.trailerUrl && (
+        <div className="mt-8">
+          <iframe
+            src={anime.trailerUrl}
+            title={`${anime.title} Trailer`}
+            className="w-full h-64 md:h-96"
+            allowFullScreen
+          />
+        </div>
+      )}
     </div>
   );
-} 
+}

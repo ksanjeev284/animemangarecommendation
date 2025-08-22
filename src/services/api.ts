@@ -137,8 +137,14 @@ export async function fetchUpcomingAnime(): Promise<Anime[]> {
 
 export async function fetchAnimeById(id: number): Promise<Anime | null> {
   try {
-    const response = await axios.get(`${JIKAN_API_BASE}/anime/${id}`);
-    return convertToAnime(response.data.data);
+    const [infoResponse, videosResponse] = await Promise.all([
+      axios.get(`${JIKAN_API_BASE}/anime/${id}`),
+      axios.get(`${JIKAN_API_BASE}/anime/${id}/videos`)
+    ]);
+
+    const trailerUrl = videosResponse.data.data?.promo?.[0]?.trailer?.embed_url;
+    const anime = convertToAnime(infoResponse.data.data);
+    return { ...anime, trailerUrl };
   } catch (error) {
     console.error('Error fetching anime by ID:', error);
     return null;

@@ -7,6 +7,7 @@ export interface Anime {
   imageUrl: string;
   description: string;
   year: number;
+  trailerUrl?: string;
 }
 
 export type UserPreferences = {

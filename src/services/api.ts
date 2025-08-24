@@ -1,6 +1,7 @@
 import axios from 'axios';
-import { Anime } from '../types/anime';
+import { Anime, AnimeCharacter } from '../types/anime';
 import { Manga } from '../types/manga';
+import { Review } from '../types/review';
 import { slugify } from '../utils/slugify';
 
 const JIKAN_API_BASE = 'https://api.jikan.moe/v4';
@@ -26,7 +27,8 @@ const convertToAnime = (anime: RawAnime): Anime => ({
   rating: anime.score || 0,
   imageUrl: anime.images.jpg.image_url,
   description: anime.synopsis,
-  year: anime.aired?.from ? new Date(anime.aired.from).getFullYear() : new Date().getFullYear()
+  year: anime.aired?.from ? new Date(anime.aired.from).getFullYear() : new Date().getFullYear(),
+  characters: []
 });
 
 interface RawManga {
@@ -56,6 +58,12 @@ const convertToManga = (manga: RawManga): Manga => ({
   chapters: manga.chapters,
   volumes: manga.volumes
 });
+
+interface RawReview {
+  user: { username: string };
+  score: number;
+  review: string;
+}
 
 // Add delay between API calls to respect rate limits
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -166,6 +174,7 @@ export async function fetchAnimeById(id: number): Promise<Anime | null> {
   }
 }
 
+
 export async function fetchAnimeBySlug(slug: string): Promise<Anime | null> {
   try {
     const query = slug.replace(/-/g, ' ');
@@ -178,6 +187,22 @@ export async function fetchAnimeBySlug(slug: string): Promise<Anime | null> {
   } catch (error) {
     console.error('Error fetching anime by slug:', error);
     return null;
+  }
+}
+
+export async function fetchAnimeReviews(id: number): Promise<Review[]> {
+  try {
+    const response = await axios.get(`${JIKAN_API_BASE}/anime/${id}/reviews`, {
+      params: { limit: 5 }
+    });
+    return response.data.data.map((review: RawReview) => ({
+      author: review.user?.username,
+      score: review.score,
+      text: review.review
+    }));
+  } catch (error) {
+    console.error('Error fetching anime reviews:', error);
+    return [];
   }
 }
 
@@ -243,6 +268,24 @@ export async function fetchMangaById(id: number): Promise<Manga | null> {
   } catch (error) {
     console.error('Error fetching manga by ID:', error);
     return null;
+  }
+}
+
+export async function fetchUserAnimeList(username: string): Promise<Anime[]> {
+  try {
+    const response = await axios.get(
+      `${JIKAN_API_BASE}/users/${username}/animelist`,
+      {
+        params: { limit: 1000 },
+      }
+    );
+    interface UserAnimeEntry {
+      anime: RawAnime;
+    }
+    return response.data.data.map((entry: UserAnimeEntry) => convertToAnime(entry.anime));
+  } catch (error) {
+    console.error('Error fetching user animelist:', error);
+    return [];
   }
 }
 

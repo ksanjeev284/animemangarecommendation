@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
+import { fetchAnimeById, fetchAnimeBySlug } from '../services/api';
 import { fetchAnimeById, fetchAnimeBySlug, fetchAnimeReviews } from '../services/api';
 import { Anime } from '../types/anime';
 import { Review } from '../types/review';
@@ -68,6 +69,14 @@ export default function AnimeDetailPage() {
           'datePublished': anime.year
         })}</script>
       </Helmet>
+      <div className="flex flex-col md:flex-row gap-8">
+        <img src={anime.imageUrl} alt={anime.title} className="w-64 h-auto rounded-lg shadow-md" />
+        <div>
+          <h1 className="text-3xl font-bold mb-2">{anime.title}</h1>
+          <div className="mb-2 text-gray-600">{anime.genre.join(', ')}</div>
+          <div className="mb-2 text-yellow-600 font-semibold">Rating: {anime.rating}</div>
+          <div className="mb-2 text-gray-500">Year: {anime.year}</div>
+          <p className="mt-4 text-gray-800">{anime.description}</p>
         <div className="flex flex-col md:flex-row gap-8">
           <img src={anime.imageUrl} alt={anime.title} className="w-64 h-auto rounded-lg shadow-md" />
           <div>
@@ -105,5 +114,8 @@ export default function AnimeDetailPage() {
           )}
         </div>
       </div>
+    </div>
+  );
+} 
     );
   }

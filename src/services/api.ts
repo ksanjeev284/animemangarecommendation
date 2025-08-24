@@ -143,23 +143,23 @@ export async function fetchUpcomingAnime(): Promise<Anime[]> {
   }
 }
 
-interface RawAnimeCharacter {
-  character: { name: string; images: { jpg: { image_url: string } } };
-  role: string;
-  voice_actors: { person: { name: string } }[];
-}
+type Weekday =
+  | 'monday'
+  | 'tuesday'
+  | 'wednesday'
+  | 'thursday'
+  | 'friday'
+  | 'saturday'
+  | 'sunday';
 
-export async function fetchAnimeCharacters(id: number): Promise<AnimeCharacter[]> {
+export async function fetchSchedule(day?: Weekday): Promise<Anime[]> {
   try {
-    const response = await axios.get(`${JIKAN_API_BASE}/anime/${id}/characters`);
-    return response.data.data.map((ch: RawAnimeCharacter) => ({
-      name: ch.character.name,
-      role: ch.role,
-      voiceActorName: ch.voice_actors?.[0]?.person?.name || 'Unknown',
-      imageUrl: ch.character.images.jpg.image_url
-    }));
+    const response = await axios.get(`${JIKAN_API_BASE}/schedules`, {
+      params: day ? { filter: day } : undefined
+    });
+    return response.data.data.map(convertToAnime);
   } catch (error) {
-    console.error('Error fetching anime characters:', error);
+    console.error('Error fetching anime schedule:', error);
     return [];
   }
 }
@@ -167,14 +167,13 @@ export async function fetchAnimeCharacters(id: number): Promise<AnimeCharacter[]
 export async function fetchAnimeById(id: number): Promise<Anime | null> {
   try {
     const response = await axios.get(`${JIKAN_API_BASE}/anime/${id}`);
-    const anime = convertToAnime(response.data.data);
-    const characters = await fetchAnimeCharacters(id);
-    return { ...anime, characters };
+    return convertToAnime(response.data.data);
   } catch (error) {
     console.error('Error fetching anime by ID:', error);
     return null;
   }
 }
+
 
 export async function fetchAnimeBySlug(slug: string): Promise<Anime | null> {
   try {

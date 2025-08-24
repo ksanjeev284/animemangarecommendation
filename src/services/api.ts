@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { Anime, AnimeCharacter } from '../types/anime';
 import { Manga } from '../types/manga';
+import { Review } from '../types/review';
 import { slugify } from '../utils/slugify';
 
 const JIKAN_API_BASE = 'https://api.jikan.moe/v4';
@@ -57,6 +58,12 @@ const convertToManga = (manga: RawManga): Manga => ({
   chapters: manga.chapters,
   volumes: manga.volumes
 });
+
+interface RawReview {
+  user: { username: string };
+  score: number;
+  review: string;
+}
 
 // Add delay between API calls to respect rate limits
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -181,6 +188,22 @@ export async function fetchAnimeBySlug(slug: string): Promise<Anime | null> {
   } catch (error) {
     console.error('Error fetching anime by slug:', error);
     return null;
+  }
+}
+
+export async function fetchAnimeReviews(id: number): Promise<Review[]> {
+  try {
+    const response = await axios.get(`${JIKAN_API_BASE}/anime/${id}/reviews`, {
+      params: { limit: 5 }
+    });
+    return response.data.data.map((review: RawReview) => ({
+      author: review.user?.username,
+      score: review.score,
+      text: review.review
+    }));
+  } catch (error) {
+    console.error('Error fetching anime reviews:', error);
+    return [];
   }
 }
 

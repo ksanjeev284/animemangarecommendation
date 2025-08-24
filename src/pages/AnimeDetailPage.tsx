@@ -2,16 +2,18 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { fetchAnimeById, fetchAnimeBySlug } from '../services/api';
+import { fetchAnimeById, fetchAnimeBySlug, fetchAnimeReviews } from '../services/api';
 import { Anime } from '../types/anime';
+import { Review } from '../types/review';
 import { useAnimeStore } from '../store/useAnimeStore';
-import { useWatchlistStore } from '../store/useWatchlistStore';
 
 export default function AnimeDetailPage() {
   const { slug } = useParams();
   const { animeList } = useAnimeStore();
   const [anime, setAnime] = useState<Anime | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
-  const { addToWatchlist, removeFromWatchlist, watchlist } = useWatchlistStore();
+  const [reviewsLoading, setReviewsLoading] = useState(false);
 
   useEffect(() => {
     async function loadAnime() {
@@ -31,14 +33,19 @@ export default function AnimeDetailPage() {
     loadAnime();
   }, [slug, animeList]);
 
+  useEffect(() => {
+    async function loadReviews() {
+      if (!anime) return;
+      setReviewsLoading(true);
+      const reviewData = await fetchAnimeReviews(anime.id);
+      setReviews(reviewData);
+      setReviewsLoading(false);
+    }
+    loadReviews();
+  }, [anime]);
+
   if (loading) return <div className="text-center py-12">Loading...</div>;
   if (!anime) return <div className="text-center py-12">Anime not found.</div>;
-
-  const isInWatchlist = watchlist.some((a) => a.id === anime.id);
-  const handleWatchlist = () => {
-    if (isInWatchlist) removeFromWatchlist(anime.id);
-    else addToWatchlist(anime);
-  };
 
   return (
     <div className="max-w-3xl mx-auto py-8 px-4">
@@ -69,34 +76,46 @@ export default function AnimeDetailPage() {
           <div className="mb-2 text-gray-600">{anime.genre.join(', ')}</div>
           <div className="mb-2 text-yellow-600 font-semibold">Rating: {anime.rating}</div>
           <div className="mb-2 text-gray-500">Year: {anime.year}</div>
-          <button
-            onClick={handleWatchlist}
-            className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"
-          >
-            {isInWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist'}
-          </button>
           <p className="mt-4 text-gray-800">{anime.description}</p>
+        <div className="flex flex-col md:flex-row gap-8">
+          <img src={anime.imageUrl} alt={anime.title} className="w-64 h-auto rounded-lg shadow-md" />
+          <div>
+            <h1 className="text-3xl font-bold mb-2">{anime.title}</h1>
+            <div className="mb-2 text-gray-600">{anime.genre.join(', ')}</div>
+            <div className="mb-2 text-yellow-600 font-semibold">Rating: {anime.rating}</div>
+            <div className="mb-2 text-gray-500">Year: {anime.year}</div>
+            <p className="mt-4 text-gray-800">{anime.description}</p>
+          </div>
+        </div>
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold mb-4">Reviews</h2>
+          {reviewsLoading ? (
+            <p className="text-gray-600">Loading reviews...</p>
+          ) : reviews.length === 0 ? (
+            <p className="text-gray-600">No reviews available.</p>
+          ) : (
+            <div className="space-y-4">
+              {reviews.slice(0, 5).map((review, index) => (
+                <div key={`${review.author}-${index}`} className="border rounded p-4">
+                  <div className="font-semibold">{review.author}</div>
+                  <div className="text-yellow-600">Score: {review.score}</div>
+                  <p className="mt-2 text-gray-700">{review.text}</p>
+                </div>
+              ))}
+              <a
+                href={`https://myanimelist.net/anime/${anime.id}/reviews`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:underline"
+              >
+                See more reviews on MyAnimeList
+              </a>
+            </div>
+          )}
         </div>
       </div>
-      {anime.characters.length > 0 && (
-        <section className="mt-8">
-          <h2 className="text-2xl font-bold mb-4">Characters</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            {anime.characters.map(character => (
-              <div key={character.name} className="text-center">
-                <img
-                  src={character.imageUrl}
-                  alt={character.name}
-                  className="w-24 h-24 object-cover rounded-full mx-auto mb-2"
-                />
-                <div className="text-sm font-medium">{character.name}</div>
-                <div className="text-xs text-gray-500">{character.role}</div>
-                <div className="text-xs text-gray-700">{character.voiceActorName}</div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
     </div>
   );
-}
+} 
+    );
+  }
